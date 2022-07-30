@@ -117,7 +117,7 @@ class TextNumberFilter {
           for (int i = 0; i < maxIntegerDigits!; i++) {
             var code = codes[i];
             var char = state[i];
-            if (char == _number_0 || char < code) {
+            if (char < code) {
               return true;
             } else if (char > code) {
               return false;
@@ -186,25 +186,31 @@ class TextNumberFilter {
   bool filterOtherDecimalPoint(int value, int index, LookupTextValueEditor state) {
     var allow = false;
     if (hasDecimalPoint && allowDecimalPoint && options.overrideDecimalPoint) {
-      if (!allowing && startPosition < index) {
-        state.remove(startPosition, index);
+      if (!allowing && startPosition < state.index) {
+        state.remove(startPosition, state.index);
       }
-      if (decimalPointAt! < index - 1) {
-        state.remove(decimalPointAt!, decimalPointAt! + 1);
-        decimalPointAt = index;
-        if (decimalPointAt! > 1 && state[0] == _number_0) {
-          state.remove(0, 1);
-          decimalPointAt = decimalPointAt! - 1;
+      if (decimalPointAt! < state.index - 1) {
+        // If the text cursor is after the dot, it takes precedence.
+        if (state.selection?.base == null ||
+            state.selection?.base != state.selection?.extent ||
+            state.selection?.base != decimalPointAt! + 1) {
+          // Change decimal point.
+          state.remove(decimalPointAt!, decimalPointAt! + 1);
+          decimalPointAt = state.index;
+          if (decimalPointAt! > 1 && state[0] == _number_0) {
+            state.remove(0, 1);
+            decimalPointAt = decimalPointAt! - 1;
+          }
+          if (maxIntegerDigits != null && maxIntegerDigits! < decimalPointAt!) {
+            state.remove(maxIntegerDigits!, decimalPointAt!);
+            decimalPointAt = maxIntegerDigits!;
+          }
+          integerDigits = state.length;
+          decimalDigits = 0;
+          allow = true;
         }
-        if (maxIntegerDigits != null && maxIntegerDigits! < decimalPointAt!) {
-          state.remove(maxIntegerDigits!, decimalPointAt!);
-          decimalPointAt = maxIntegerDigits!;
-        }
-        integerDigits = state.length;
-        decimalDigits = 0;
-        allow = true;
       }
-      startPosition = index;
+      startPosition = state.index;
       allowing = allow;
     }
     return allow;

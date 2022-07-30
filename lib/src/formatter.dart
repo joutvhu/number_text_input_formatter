@@ -5,13 +5,18 @@ import 'editor.dart';
 part 'filter.dart';
 
 class NumberTextInputFormatter extends TextInputFormatter {
-  static final numberTester = RegExp(r'^([1-9][0-9]*)(\\.[0-9]+)?$');
+  static final numberTester = RegExp(r'^0*([1-9][0-9]*)(\.([0-9]+))?$');
 
   final String? prefix;
   final String? suffix;
+
+  /// Allow input of negative numbers?
   final bool allowNegative;
+  /// Automatically insert decimal point.
   final bool insertDecimalPoint;
+  /// Always add decimals.
   final bool addDecimalDigits;
+  /// Allow to change decimal point position?
   final bool overrideDecimalPoint;
 
   late final String? maxInteger;
@@ -53,8 +58,12 @@ class NumberTextInputFormatter extends TextInputFormatter {
       }
 
       if (decimalDigits != null) {
-        if (maxDecimal != null && maxDecimal.length > decimalDigits) {
-          maxDecimal = maxDecimal.substring(0, decimalDigits);
+        if (maxDecimal != null) {
+          if (maxDecimal.length > decimalDigits) {
+            maxDecimal = maxDecimal.substring(0, decimalDigits);
+          } else if (maxDecimal.length < decimalDigits) {
+            maxDecimal += '0' * (decimalDigits - maxDecimal.length);
+          }
         }
       } else {
         decimalDigits = maxDecimal?.length;
@@ -76,8 +85,7 @@ class NumberTextInputFormatter extends TextInputFormatter {
 
     final bool isRemovedCharacter = oldValue.text.length - 1 == newValue.text.length;
     TextValueEditor state = TextValueEditor(newValue);
-    TextNumberFilter numberFilter = createFilter(state);
-    numberFilter.setup(isRemoving: isRemovedCharacter).filter();
+    createFilter(state).setup(isRemoving: isRemovedCharacter).filter();
 
     if (state.toString().isNotEmpty) {
       if (prefix != null) {
@@ -98,18 +106,25 @@ class NumberTextInputFormatter extends TextInputFormatter {
 
 class DollarTextInputFormatter extends NumberTextInputFormatter {
   DollarTextInputFormatter({
-    String? prefix = '\$ ',
+    String? prefix,
     String? suffix,
-    bool allowNegative = false,
     int? integerDigits,
     int decimalDigits = 2,
+    String? maxValue,
+    bool allowNegative = false,
+    bool overrideDecimalPoint = false,
+    bool insertDecimalPoint = true,
+    bool addDecimalDigits = false,
   }) : super(
           prefix: prefix,
           suffix: suffix,
-          allowNegative: allowNegative,
           integerDigits: integerDigits,
           decimalDigits: decimalDigits,
-          addDecimalDigits: true,
+          maxValue: maxValue,
+          allowNegative: allowNegative,
+          overrideDecimalPoint: overrideDecimalPoint,
+          insertDecimalPoint: insertDecimalPoint,
+          addDecimalDigits: addDecimalDigits,
         );
 }
 
@@ -117,13 +132,22 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
   PercentageTextInputFormatter({
     String? prefix,
     String? suffix,
-    int? decimalDigits,
-  }) : super(
+    int integerDigits = 3,
+    int decimalDigits = 0,
+    bool allowNegative = false,
+    bool overrideDecimalPoint = false,
+    bool insertDecimalPoint = false,
+    bool addDecimalDigits = true,
+  })  : assert(integerDigits > 2),
+        super(
           prefix: prefix,
           suffix: suffix,
-          allowNegative: false,
-          integerDigits: 3,
+          integerDigits: integerDigits,
           decimalDigits: decimalDigits,
-          maxValue: '100.00',
+          maxValue: '1${'0' * (integerDigits - 1)}${decimalDigits > 0 ? '.${'0' * decimalDigits}' : ''}',
+          allowNegative: allowNegative,
+          overrideDecimalPoint: overrideDecimalPoint,
+          insertDecimalPoint: insertDecimalPoint,
+          addDecimalDigits: addDecimalDigits,
         );
 }
