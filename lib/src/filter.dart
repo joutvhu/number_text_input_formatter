@@ -31,6 +31,7 @@ class TextNumberFilter {
   int? decimalPointAt;
   int decimalDigits = 0;
   bool limitedNumber = false;
+  bool limitedInteger = false;
   bool limitedDecimal = false;
   bool numberStarted = false;
   bool hasNumber = false;
@@ -96,6 +97,7 @@ class TextNumberFilter {
       editor.remove(startPosition, editor.length);
     }
     if (hasNumber && integerDigits == 0) {
+      integerDigits = 1;
       editor.prefix('0');
     }
 
@@ -107,29 +109,38 @@ class TextNumberFilter {
   bool filterInteger(int value, int index, LookupTextValueEditor state) {
     hasNumber = true;
     if (value != _number_0) foundNumbers = true;
-    if (foundNumbers) {
-      integerDigits++;
-      if (maxIntegerDigits == null || integerDigits < maxIntegerDigits!) {
+    if (foundNumbers && !limitedInteger) {
+      var newIntegerDigits = integerDigits + 1;
+      if (maxIntegerDigits == null || newIntegerDigits < maxIntegerDigits!) {
+        integerDigits = newIntegerDigits;
         return true;
-      } else if (maxIntegerDigits != null && integerDigits == maxIntegerDigits!) {
+      } else if (maxIntegerDigits != null && newIntegerDigits == maxIntegerDigits!) {
         if (options.maxInteger != null && options.maxInteger!.length == maxIntegerDigits) {
           var codes = options.maxInteger!.codeUnits;
           for (int i = 0; i < maxIntegerDigits!; i++) {
             var code = codes[i];
             var char = state[i];
             if (char < code) {
+              integerDigits = newIntegerDigits;
               return true;
             } else if (char > code) {
+              limitedInteger = true;
               return false;
             }
           }
           limitedNumber = true;
+          integerDigits = newIntegerDigits;
           return true;
         } else {
+          integerDigits = newIntegerDigits;
           return true;
         }
       } else {
-        return filterOverInteger(value, state.index, state);
+        var allow = filterOverInteger(value, state.index, state);
+        if (allow) {
+          integerDigits++;
+        }
+        return allow;
       }
     }
     return false;
@@ -142,11 +153,11 @@ class TextNumberFilter {
   bool filterDecimalPoint(int value, int index, LookupTextValueEditor state) {
     if (hasDecimalPoint && allowDecimalPoint) {
       if (integerDigits == 0) {
-        integerDigits++;
         if (!allowing && startPosition < state.index) {
           state.remove(startPosition, state.index);
         }
         state.prefix('0');
+        integerDigits = 1;
         allowing = true;
         startPosition = state.index;
       }
@@ -157,9 +168,9 @@ class TextNumberFilter {
   }
 
   bool filterDecimal(int value, int index, LookupTextValueEditor state) {
-    decimalDigits++;
-    if (maxDecimalDigits == null || decimalDigits <= maxDecimalDigits!) {
+    if (maxDecimalDigits == null || decimalDigits < maxDecimalDigits!) {
       if (maxDecimalDigits == null || value == _number_0) {
+        decimalDigits++;
         return true;
       } else if (limitedDecimal) {
         return false;
@@ -168,15 +179,18 @@ class TextNumberFilter {
         var char = codes[state.index - decimalPointAt! - 1];
         if (value < char) {
           limitedNumber = false;
+          decimalDigits++;
           return true;
         } else if (value > char) {
           limitedDecimal = true;
           return false;
         } else {
+          decimalDigits++;
           return true;
         }
       } else {
         limitedNumber = false;
+        decimalDigits++;
         return true;
       }
     }
@@ -226,23 +240,31 @@ class TextNumberFilter {
         insertDecimalPoint();
       }
     }
+
+    groupIntegerDigits();
   }
 
   void insertDecimalDigits() {
+    decimalPointAt ??= editor.length - 1;
     if (!removing) {
-      var insertDigits = options.decimalDigits ?? 1;
-      editor.suffix('0' * insertDigits);
+      decimalDigits = options.decimalDigits ?? 1;
+      editor.suffix('0' * decimalDigits);
     }
   }
 
   void insertDecimalPoint() {
     if (options.addDecimalDigits) {
       if (!removing) {
-        editor.suffix('.${'0' * options.decimalDigits!}');
+        decimalPointAt = editor.length;
+        decimalDigits = options.decimalDigits!;
+        editor.suffix('.${'0' * decimalDigits}');
       }
     } else if (options.insertDecimalPoint) {
       if (editor.length > options.decimalDigits!) {
-        editor.insert(editor.length - options.decimalDigits!, '.');
+        decimalPointAt = editor.length - options.decimalDigits!;
+        integerDigits = decimalPointAt!;
+        decimalDigits = options.decimalDigits!;
+        editor.insert(decimalPointAt!, '.');
       } else {
         if (!removing || editor.length > 1 || (editor.length == 1 && editor[0] != _number_0)) {
           var missingNumber = options.decimalDigits! - editor.length;
@@ -250,8 +272,24 @@ class TextNumberFilter {
           if (missingNumber > 0) {
             missingInteger += '0' * missingNumber;
           }
+          integerDigits = 1;
+          decimalDigits = options.decimalDigits!;
+          decimalPointAt = 1;
           editor.prefix(missingInteger);
         }
+      }
+    }
+  }
+
+  groupIntegerDigits() {
+    if (options.groupIntegerDigits != null) {
+      var index = integerDigits;
+      while (true) {
+        index -= options.groupIntegerDigits!;
+        if (index < 1) {
+          break;
+        }
+        editor.insert(index, ',');
       }
     }
   }

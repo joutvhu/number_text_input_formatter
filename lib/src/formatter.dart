@@ -19,6 +19,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
   /// Allow to change decimal point position?
   final bool overrideDecimalPoint;
 
+  late final int? groupIntegerDigits;
+
   late final String? maxInteger;
   late final String? maxDecimal;
   late final int? integerDigits;
@@ -30,12 +32,14 @@ class NumberTextInputFormatter extends TextInputFormatter {
     int? integerDigits,
     int? decimalDigits,
     String? maxValue,
+    this.groupIntegerDigits,
     this.allowNegative = false,
     this.overrideDecimalPoint = false,
     this.insertDecimalPoint = false,
     this.addDecimalDigits = false,
   })  : assert(integerDigits == null || integerDigits > 0),
-        assert(decimalDigits == null || decimalDigits >= 0) {
+        assert(decimalDigits == null || decimalDigits >= 0),
+        assert(groupIntegerDigits == null || groupIntegerDigits > 1) {
     String? maxInteger;
     String? maxDecimal;
 
@@ -112,6 +116,7 @@ class DollarTextInputFormatter extends NumberTextInputFormatter {
     int decimalDigits = 2,
     String? maxValue,
     bool allowNegative = false,
+    int groupIntegerDigits = 3,
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = true,
     bool addDecimalDigits = false,
@@ -122,6 +127,7 @@ class DollarTextInputFormatter extends NumberTextInputFormatter {
           decimalDigits: decimalDigits,
           maxValue: maxValue,
           allowNegative: allowNegative,
+          groupIntegerDigits : groupIntegerDigits,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
           addDecimalDigits: addDecimalDigits,
@@ -135,6 +141,7 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
     int integerDigits = 3,
     int decimalDigits = 0,
     bool allowNegative = false,
+    int? groupIntegerDigits,
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = false,
     bool addDecimalDigits = true,
@@ -146,6 +153,7 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
           decimalDigits: decimalDigits,
           maxValue: '1${'0' * (integerDigits - 1)}${decimalDigits > 0 ? '.${'0' * decimalDigits}' : ''}',
           allowNegative: allowNegative,
+          groupIntegerDigits: groupIntegerDigits,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
           addDecimalDigits: addDecimalDigits,
