@@ -1,0 +1,23 @@
+name: number_text_input_formatter
+description: Number Text Input Formatter for Flutter
+version: 0.0.1+1
+
+homepage: https://github.com/joutvhu/number_text_input_formatter
+repository: https://github.com/joutvhu/number_text_input_formatter.git
+
+environment:
+  sdk: ">=2.17.6 <3.0.0"
+  flutter: ">=1.17.0"
+
+# Dart Scripts Runner plugin https://github.com/joutvhu/dart-scripts
+scripts:
+  publish: dart pub publish
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
