@@ -15,7 +15,7 @@ const CODE_9 = 57;
 
 class TextNumberFilter {
   final NumberTextInputFormatter options;
-  final TextValueEditor state;
+  final TextValueEditor editor;
 
   bool hasDecimalPoint = true;
   bool allowDecimalPoint = true;
@@ -36,7 +36,7 @@ class TextNumberFilter {
   bool foundNumbers = false;
   bool foundDecimalPoint = false;
 
-  TextNumberFilter(this.options, this.state);
+  TextNumberFilter(this.options, this.editor);
 
   TextNumberFilter setup({
     bool isRemoving = false,
@@ -58,7 +58,7 @@ class TextNumberFilter {
   }
 
   TextValueEditor filter() {
-    String textValue = state.text;
+    String textValue = editor.text;
     int length = textValue.length;
 
     for (int i = 0; i < length; i++) {
@@ -86,7 +86,7 @@ class TextNumberFilter {
       if (allowing != allow) {
         if (regionStart != regionEnd) {
           if (!allowing) {
-            state.remove(regionStart - deleted, regionEnd - deleted);
+            editor.remove(regionStart - deleted, regionEnd - deleted);
             deleted += regionEnd - regionStart;
           }
         }
@@ -97,15 +97,15 @@ class TextNumberFilter {
     }
 
     if (regionStart != regionEnd && !allowing) {
-      state.remove(regionStart - deleted, regionEnd - deleted);
+      editor.remove(regionStart - deleted, regionEnd - deleted);
     }
     if (hasNumber && integerDigits == 0) {
-      state.prefix('0');
+      editor.prefix('0');
     }
 
     insertValueAfterFilter();
 
-    return state;
+    return editor;
   }
 
   bool filterInteger(String char, int index) {
@@ -131,10 +131,10 @@ class TextNumberFilter {
       if (integerDigits == 0) {
         integerDigits++;
         if (!allowing && regionStart != regionEnd) {
-          state.remove(regionStart - deleted, regionEnd - deleted);
+          editor.remove(regionStart - deleted, regionEnd - deleted);
           deleted += regionEnd - regionStart;
         }
-        state.insert(index - deleted, '0');
+        editor.insert(index - deleted, '0');
         allowing = true;
         deleted--;
         regionStart = index;
@@ -161,24 +161,24 @@ class TextNumberFilter {
     var allow = false;
     if (hasDecimalPoint && allowDecimalPoint && options.overrideDecimalPoint) {
       if (!allowing && regionStart != regionEnd) {
-        state.remove(regionStart - deleted, regionEnd - deleted);
+        editor.remove(regionStart - deleted, regionEnd - deleted);
         deleted += regionEnd - regionStart;
       }
       if (decimalPointAt! < index - deleted - 1) {
-        state.remove(decimalPointAt!, decimalPointAt! + 1);
+        editor.remove(decimalPointAt!, decimalPointAt! + 1);
         deleted++;
         decimalPointAt = index - deleted;
-        if (decimalPointAt! > 1 && state.at(0) == '0') {
-          state.remove(0, 1);
+        if (decimalPointAt! > 1 && editor.at(0) == '0') {
+          editor.remove(0, 1);
           deleted++;
           decimalPointAt = decimalPointAt! - 1;
         }
         if (maxIntegerDigits != null && maxIntegerDigits! < decimalPointAt!) {
-          state.remove(maxIntegerDigits!, decimalPointAt!);
+          editor.remove(maxIntegerDigits!, decimalPointAt!);
           deleted += decimalPointAt! - maxIntegerDigits!;
           decimalPointAt = maxIntegerDigits!;
         }
-        integerDigits = state.length;
+        integerDigits = editor.length;
         decimalDigits = 0;
         allow = true;
       }
@@ -205,26 +205,26 @@ class TextNumberFilter {
   void insertDecimalDigits() {
     if (!removing) {
       var insertDigits = options.integerDigits ?? 1;
-      state.suffix('0' * insertDigits);
+      editor.suffix('0' * insertDigits);
     }
   }
 
   void insertDecimalPoint() {
     if (options.addDecimalDigits) {
       if (!removing) {
-        state.suffix('.${'0' * options.decimalDigits!}');
+        editor.suffix('.${'0' * options.decimalDigits!}');
       }
     } else if (options.insertDecimalPoint) {
-      if (state.length > options.decimalDigits!) {
-        state.insert(state.length - options.decimalDigits!, '.');
+      if (editor.length > options.decimalDigits!) {
+        editor.insert(editor.length - options.decimalDigits!, '.');
       } else {
-        if (!removing || state.length > 1 || (state.length == 1 && state[0] != CODE_0)) {
-          var missingNumber = options.decimalDigits! - state.length;
+        if (!removing || editor.length > 1 || (editor.length == 1 && editor[0] != CODE_0)) {
+          var missingNumber = options.decimalDigits! - editor.length;
           var missingInteger = '0.';
           if (missingNumber > 0) {
             missingInteger += '0' * missingNumber;
           }
-          state.prefix(missingInteger);
+          editor.prefix(missingInteger);
         }
       }
     }
@@ -241,7 +241,7 @@ class TextPercentageFilter extends TextNumberFilter {
   bool filterOverInteger(String char, int index) {
     if (!decimalOnlyZero && char == '0') {
       // UTF-16 code: 48 = 0, 49 = 1
-      if (index - deleted == 2 && state.codeUnits[0] == 49 && state.codeUnits[1] == 48) {
+      if (index - deleted == 2 && editor.codeUnits[0] == 49 && editor.codeUnits[1] == 48) {
         decimalOnlyZero = true;
         return true;
       }
