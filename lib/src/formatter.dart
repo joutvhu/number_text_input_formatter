@@ -5,6 +5,8 @@ import 'editor.dart';
 part 'filter.dart';
 
 class NumberTextInputFormatter extends TextInputFormatter {
+  static final numberTester = RegExp(r'^([1-9][0-9]*)(\\.[0-9]+)?$');
+
   final String? prefix;
   final String? suffix;
   final bool allowNegative;
@@ -20,37 +22,49 @@ class NumberTextInputFormatter extends TextInputFormatter {
   NumberTextInputFormatter({
     this.prefix,
     this.suffix,
-    this.allowNegative = false,
     int? integerDigits,
     int? decimalDigits,
     String? maxValue,
+    this.allowNegative = false,
     this.overrideDecimalPoint = false,
     this.insertDecimalPoint = false,
     this.addDecimalDigits = false,
   })  : assert(integerDigits == null || integerDigits > 0),
         assert(decimalDigits == null || decimalDigits >= 0) {
+    String? maxInteger;
+    String? maxDecimal;
+
     if (maxValue != null) {
-      var maxValues = maxValue.split('.');
-      maxInteger = maxValues[0];
-      maxDecimal = maxValues[1];
+      var maxValues = numberTester.matchAsPrefix(maxValue);
+      assert(maxValues != null && maxValues.groupCount > 0);
+      maxInteger = maxValues?.group(1);
+      maxDecimal = maxValues?.group(3);
 
-      if (maxInteger != null) {
-        this.integerDigits =
-            integerDigits == null || maxInteger!.length < integerDigits ? maxInteger!.length : integerDigits;
+      if (integerDigits != null) {
+        if (maxInteger != null) {
+          if (maxInteger.length <= integerDigits) {
+            integerDigits = maxInteger.length;
+          } else {
+            maxInteger = maxInteger.substring(maxInteger.length - integerDigits);
+          }
+        }
       } else {
-        this.integerDigits = integerDigits;
+        integerDigits = maxInteger?.length;
       }
 
-      if (maxDecimal != null) {
-        this.decimalDigits =
-            decimalDigits == null || maxDecimal!.length < decimalDigits ? maxDecimal!.length : decimalDigits;
+      if (decimalDigits != null) {
+        if (maxDecimal != null && maxDecimal.length > decimalDigits) {
+          maxDecimal = maxDecimal.substring(0, decimalDigits);
+        }
       } else {
-        this.decimalDigits = decimalDigits;
+        decimalDigits = maxDecimal?.length;
       }
-    } else {
-      this.integerDigits = integerDigits;
-      this.decimalDigits = decimalDigits;
     }
+
+    this.maxInteger = maxInteger;
+    this.maxDecimal = maxDecimal;
+    this.integerDigits = integerDigits;
+    this.decimalDigits = decimalDigits;
   }
 
   @override
@@ -108,13 +122,8 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
           prefix: prefix,
           suffix: suffix,
           allowNegative: false,
-          integerDigits: 2,
+          integerDigits: 3,
           decimalDigits: decimalDigits,
           maxValue: '100.00',
         );
-
-  @override
-  TextNumberFilter createFilter(TextValueEditor state) {
-    return TextPercentageFilter(this, state);
-  }
 }

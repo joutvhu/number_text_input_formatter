@@ -72,9 +72,11 @@ class DefaultTextValueEditor implements TextValueEditor {
 
   @override
   forEach(bool Function(int value, int index, LookupTextValueEditor state) handler) {
-    var state = LookupTextValueEditor(this);
+    var state = LookupTextValueEditor._(this);
     do {
-      handler(codeUnits[state.index], state.index, state);
+      if (!handler(codeUnits[state.index], state.index, state)) {
+        break;
+      }
       state.index = state.index + 1;
     } while (state.index < length);
   }
@@ -92,10 +94,10 @@ class DefaultTextValueEditor implements TextValueEditor {
   }
 
   @override
-  insert(int at, String value) {
-    assert(at <= length);
-    codeUnits.insertAll(at, value.codeUnits);
-    _adjustIndex(at, at, value.codeUnits.length);
+  insert(int index, String value) {
+    assert(index <= length);
+    codeUnits.insertAll(index, value.codeUnits);
+    _adjustIndex(index, index, value.codeUnits.length);
   }
 
   @override
@@ -176,7 +178,7 @@ class LookupTextValueEditor implements TextValueEditor {
   TextValueEditor editor;
   int index;
 
-  LookupTextValueEditor(this.editor) : index = 0;
+  LookupTextValueEditor._(this.editor) : index = 0;
 
   @override
   List<int> get codeUnits => editor.codeUnits;
@@ -218,6 +220,9 @@ class LookupTextValueEditor implements TextValueEditor {
 
   @override
   suffix(String value) {
+    if (index == length) {
+      index += value.length;
+    }
     return editor.suffix(value);
   }
 
@@ -227,6 +232,15 @@ class LookupTextValueEditor implements TextValueEditor {
     if (index <= this.index) {
       index += value.length;
     }
+    return editor.insert(index, value);
+  }
+
+  insertBefore(String value) {
+    index += value.length;
+    return editor.insert(index, value);
+  }
+
+  insertAfter(String value) {
     return editor.insert(index, value);
   }
 
