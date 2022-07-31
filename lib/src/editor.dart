@@ -15,6 +15,10 @@ abstract class TextValueEditor {
 
   String get text;
 
+  bool get isEmpty;
+
+  bool get isNotEmpty;
+
   TextEditingValue get inputValue;
 
   MutableTextRange? get selection;
@@ -54,6 +58,12 @@ class DefaultTextValueEditor implements TextValueEditor {
 
   @override
   int get length => codeUnits.length;
+
+  @override
+  bool get isEmpty => codeUnits.isEmpty;
+
+  @override
+  bool get isNotEmpty => codeUnits.isNotEmpty;
 
   DefaultTextValueEditor(this.inputValue)
       : selection = MutableTextRange.fromTextSelection(inputValue.selection),
@@ -196,10 +206,16 @@ class LookupTextValueEditor implements TextValueEditor {
   }
 
   @override
+  String get text => editor.text;
+
+  @override
   int get length => editor.length;
 
   @override
-  String get text => editor.text;
+  bool get isEmpty => editor.isEmpty;
+
+  @override
+  bool get isNotEmpty => editor.isNotEmpty;
 
   int get currentCode => editor[index];
 

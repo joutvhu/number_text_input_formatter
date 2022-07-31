@@ -249,17 +249,19 @@ class TextNumberFilter {
   }
 
   void afterFilter() {
-    if (decimalPoint != null) {
-      if (decimalDigits == 0) {
-        insertDecimalDigits();
+    if (editor.isNotEmpty) {
+      if (decimalPoint != null) {
+        if (decimalDigits == 0) {
+          insertDecimalDigits();
+        }
+      } else {
+        if (hasDecimalPoint) {
+          insertDecimalPoint();
+        }
       }
-    } else {
-      if (hasDecimalPoint) {
-        insertDecimalPoint();
-      }
-    }
 
-    groupDigits();
+      groupDigits();
+    }
   }
 
   void insertDecimalDigits() {

@@ -117,11 +117,13 @@ class NumberTextInputFormatter extends TextInputFormatter {
         ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})
         ..filter();
 
-    if (prefix != null) {
-      state.prefix(prefix!);
-    }
-    if (suffix != null) {
-      state.suffix(suffix!);
+    if (state.isNotEmpty) {
+      if (prefix != null) {
+        state.prefix(prefix!);
+      }
+      if (suffix != null) {
+        state.suffix(suffix!);
+      }
     }
 
     return state.finalize();
