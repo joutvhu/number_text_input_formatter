@@ -18,8 +18,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
   final bool addDecimalDigits;
   /// Allow to change decimal point position?
   final bool overrideDecimalPoint;
-
-  late final int? groupIntegerDigits;
+  /// Grouping of 2 or more digits with commas
+  final int? groupIntegerDigits;
 
   late final String? maxInteger;
   late final String? maxDecimal;
@@ -108,8 +108,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
   }
 }
 
-class DollarTextInputFormatter extends NumberTextInputFormatter {
-  DollarTextInputFormatter({
+class CurrencyTextInputFormatter extends NumberTextInputFormatter {
+  CurrencyTextInputFormatter({
     String? prefix,
     String? suffix,
     int? integerDigits,
