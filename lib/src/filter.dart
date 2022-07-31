@@ -40,8 +40,6 @@ class TextNumberFilter {
 
   TextNumberFilter(this.options, this.editor);
 
-  bool get foundDecimalPoint => decimalPoint != null;
-
   TextNumberFilter setup({
     bool isRemoving = false,
   }) {
@@ -87,7 +85,7 @@ class TextNumberFilter {
     bool allow = false;
     if (!numberStarted && options.allowNegative && value == _negative) {
       allow = true;
-    } else if (!foundDecimalPoint) {
+    } else if (decimalPoint == null) {
       if (_number_0 <= value && value <= _number_9) {
         allow = filterInteger(value, state.index, state);
       } else if (value == decimalSeparator.codeUnitAt(0)) {
@@ -253,7 +251,7 @@ class TextNumberFilter {
   }
 
   void insertValueAfterFilter() {
-    if (foundDecimalPoint) {
+    if (decimalPoint != null) {
       if (decimalDigits == 0) {
         insertDecimalDigits();
       }

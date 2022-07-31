@@ -116,13 +116,11 @@ class NumberTextInputFormatter extends TextInputFormatter {
     TextValueEditor state = TextValueEditor(newValue);
     createFilter(state).setup(isRemoving: isRemovedCharacter).filter();
 
-    if (state.toString().isNotEmpty) {
-      if (prefix != null) {
-        state.prefix(prefix!);
-      }
-      if (suffix != null) {
-        state.suffix(suffix!);
-      }
+    if (prefix != null) {
+      state.prefix(prefix!);
+    }
+    if (suffix != null) {
+      state.suffix(suffix!);
     }
 
     return state.finalize();
