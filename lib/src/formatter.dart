@@ -34,8 +34,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
   /// Automatically insert decimal point.
   final bool insertDecimalPoint;
 
-  /// Always add decimals.
-  final bool addDecimalDigits;
+  /// Always add decimal digits.
+  final bool insertDecimalDigits;
 
   /// Allow to change decimal point position?
   final bool overrideDecimalPoint;
@@ -58,7 +58,7 @@ class NumberTextInputFormatter extends TextInputFormatter {
     this.allowNegative = false,
     this.overrideDecimalPoint = false,
     this.insertDecimalPoint = false,
-    this.addDecimalDigits = false,
+    this.insertDecimalDigits = false,
   })  : assert(integerDigits == null || integerDigits > 0),
         assert(decimalDigits == null || decimalDigits >= 0),
         assert(decimalSeparator.length == 1),
@@ -145,7 +145,7 @@ class CurrencyTextInputFormatter extends NumberTextInputFormatter {
     String groupSeparator = ',',
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = true,
-    bool addDecimalDigits = false,
+    bool insertDecimalDigits = false,
   }) : super(
           prefix: prefix,
           suffix: suffix,
@@ -158,7 +158,7 @@ class CurrencyTextInputFormatter extends NumberTextInputFormatter {
           groupSeparator: groupSeparator,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
-          addDecimalDigits: addDecimalDigits,
+          insertDecimalDigits: insertDecimalDigits,
         );
 }
 
@@ -174,7 +174,7 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
     String groupSeparator = ',',
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = false,
-    bool addDecimalDigits = true,
+    bool insertDecimalDigits = true,
   })  : assert(integerDigits > 2),
         super(
           prefix: prefix,
@@ -188,6 +188,6 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
           groupSeparator: groupSeparator,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
-          addDecimalDigits: addDecimalDigits,
+          insertDecimalDigits: insertDecimalDigits,
         );
 }

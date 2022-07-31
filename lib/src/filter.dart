@@ -43,7 +43,7 @@ class TextNumberFilter {
   TextNumberFilter prepare(Map<String, dynamic> params) {
     removing = params['removing'] == true;
     hasDecimalPoint = options.decimalDigits == null || options.decimalDigits! > 0;
-    allowDecimalPoint = options.addDecimalDigits || !options.insertDecimalPoint;
+    allowDecimalPoint = options.insertDecimalDigits || !options.insertDecimalPoint;
     decimalWithoutPoint = hasDecimalPoint && !allowDecimalPoint;
     maxIntegerDigits = options.integerDigits;
     maxDecimalDigits = options.decimalDigits;
@@ -271,7 +271,7 @@ class TextNumberFilter {
   }
 
   void insertDecimalPoint() {
-    if (options.addDecimalDigits) {
+    if (options.insertDecimalDigits) {
       if (!removing) {
         decimalPoint = editor.length;
         decimalDigits = options.decimalDigits!;
