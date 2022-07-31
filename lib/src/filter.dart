@@ -24,11 +24,12 @@ class TextNumberFilter {
   bool removing = false;
   int? maxIntegerDigits;
   int? maxDecimalDigits;
-
+  String decimalSeparator = '.';
+  String groupSeparator = ',';
   bool allowing = true;
   int startPosition = 0;
   int integerDigits = 0;
-  int? decimalPointAt;
+  int? decimalPoint;
   int decimalDigits = 0;
   bool limitedNumber = false;
   bool limitedInteger = false;
@@ -39,7 +40,7 @@ class TextNumberFilter {
 
   TextNumberFilter(this.options, this.editor);
 
-  bool get foundDecimalPoint => decimalPointAt != null;
+  bool get foundDecimalPoint => decimalPoint != null;
 
   TextNumberFilter setup({
     bool isRemoving = false,
@@ -58,6 +59,21 @@ class TextNumberFilter {
       }
       maxDecimalDigits = 0;
     }
+    decimalSeparator = options.decimalSeparator;
+    groupSeparator = options.groupSeparator;
+
+    allowing = true;
+    startPosition = 0;
+    integerDigits = 0;
+    decimalPoint = null;
+    decimalDigits = 0;
+    limitedNumber = false;
+    limitedInteger = false;
+    limitedDecimal = false;
+    numberStarted = false;
+    hasNumber = false;
+    foundNumbers = false;
+
     return this;
   }
 
@@ -69,13 +85,13 @@ class TextNumberFilter {
       } else if (!foundDecimalPoint) {
         if (_number_0 <= value && value <= _number_9) {
           allow = filterInteger(value, state.index, state);
-        } else if (value == _dot) {
+        } else if (value == decimalSeparator.codeUnitAt(0)) {
           allow = filterDecimalPoint(value, state.index, state);
         }
       } else {
         if (_number_0 <= value && value <= _number_9) {
           allow = filterDecimal(value, state.index, state);
-        } else if (value == _dot) {
+        } else if (value == decimalSeparator.codeUnitAt(0)) {
           allow = filterOtherDecimalPoint(value, state.index, state);
         }
       }
@@ -161,7 +177,7 @@ class TextNumberFilter {
         allowing = true;
         startPosition = state.index;
       }
-      decimalPointAt = state.index;
+      decimalPoint = state.index;
       return true;
     }
     return false;
@@ -176,7 +192,7 @@ class TextNumberFilter {
         return false;
       } else if (limitedNumber && options.maxDecimal != null && options.maxDecimal!.length == maxDecimalDigits) {
         var codes = options.maxDecimal!.codeUnits;
-        var char = codes[state.index - decimalPointAt! - 1];
+        var char = codes[state.index - decimalPoint! - 1];
         if (value < char) {
           limitedNumber = false;
           decimalDigits++;
@@ -203,21 +219,21 @@ class TextNumberFilter {
       if (!allowing && startPosition < state.index) {
         state.remove(startPosition, state.index);
       }
-      if (decimalPointAt! < state.index - 1) {
+      if (decimalPoint! < state.index - 1) {
         // If the text cursor is after the dot, it takes precedence.
         if (state.selection?.base == null ||
             state.selection?.base != state.selection?.extent ||
-            state.selection?.base != decimalPointAt! + 1) {
+            state.selection?.base != decimalPoint! + 1) {
           // Change decimal point.
-          state.remove(decimalPointAt!, decimalPointAt! + 1);
-          decimalPointAt = state.index;
-          if (decimalPointAt! > 1 && state[0] == _number_0) {
+          state.remove(decimalPoint!, decimalPoint! + 1);
+          decimalPoint = state.index;
+          if (decimalPoint! > 1 && state[0] == _number_0) {
             state.remove(0, 1);
-            decimalPointAt = decimalPointAt! - 1;
+            decimalPoint = decimalPoint! - 1;
           }
-          if (maxIntegerDigits != null && maxIntegerDigits! < decimalPointAt!) {
-            state.remove(maxIntegerDigits!, decimalPointAt!);
-            decimalPointAt = maxIntegerDigits!;
+          if (maxIntegerDigits != null && maxIntegerDigits! < decimalPoint!) {
+            state.remove(maxIntegerDigits!, decimalPoint!);
+            decimalPoint = maxIntegerDigits!;
           }
           integerDigits = state.length;
           decimalDigits = 0;
@@ -245,7 +261,7 @@ class TextNumberFilter {
   }
 
   void insertDecimalDigits() {
-    decimalPointAt ??= editor.length - 1;
+    decimalPoint ??= editor.length - 1;
     if (!removing) {
       decimalDigits = options.decimalDigits ?? 1;
       editor.suffix('0' * decimalDigits);
@@ -255,26 +271,26 @@ class TextNumberFilter {
   void insertDecimalPoint() {
     if (options.addDecimalDigits) {
       if (!removing) {
-        decimalPointAt = editor.length;
+        decimalPoint = editor.length;
         decimalDigits = options.decimalDigits!;
-        editor.suffix('.${'0' * decimalDigits}');
+        editor.suffix('$decimalSeparator${'0' * decimalDigits}');
       }
     } else if (options.insertDecimalPoint) {
       if (editor.length > options.decimalDigits!) {
-        decimalPointAt = editor.length - options.decimalDigits!;
-        integerDigits = decimalPointAt!;
+        decimalPoint = editor.length - options.decimalDigits!;
+        integerDigits = decimalPoint!;
         decimalDigits = options.decimalDigits!;
-        editor.insert(decimalPointAt!, '.');
+        editor.insert(decimalPoint!, decimalSeparator);
       } else {
         if (!removing || editor.length > 1 || (editor.length == 1 && editor[0] != _number_0)) {
           var missingNumber = options.decimalDigits! - editor.length;
-          var missingInteger = '0.';
+          var missingInteger = '0$decimalSeparator';
           if (missingNumber > 0) {
             missingInteger += '0' * missingNumber;
           }
           integerDigits = 1;
           decimalDigits = options.decimalDigits!;
-          decimalPointAt = 1;
+          decimalPoint = 1;
           editor.prefix(missingInteger);
         }
       }
@@ -282,14 +298,14 @@ class TextNumberFilter {
   }
 
   groupIntegerDigits() {
-    if (options.groupIntegerDigits != null) {
+    if (options.groupDigits != null) {
       var index = integerDigits;
       while (true) {
-        index -= options.groupIntegerDigits!;
+        index -= options.groupDigits!;
         if (index < 1) {
           break;
         }
-        editor.insert(index, ',');
+        editor.insert(index, groupSeparator);
       }
     }
   }

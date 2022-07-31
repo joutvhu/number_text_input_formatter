@@ -7,24 +7,44 @@ part 'filter.dart';
 class NumberTextInputFormatter extends TextInputFormatter {
   static final numberTester = RegExp(r'^0*([1-9][0-9]*)(\.([0-9]+))?$');
 
+  /// Insert prefix after format.
   final String? prefix;
+
+  /// Insert suffix after format.
   final String? suffix;
+
+  /// Maximum value of integer.
+  late final String? maxInteger;
+
+  /// The maximum value of the decimal when the integer part reaches the maximum.
+  late final String? maxDecimal;
+
+  /// Maximum number of integer digits.
+  late final int? integerDigits;
+
+  /// Maximum number of decimal digits.
+  late final int? decimalDigits;
+
+  /// Decimal Separator: default is dot.
+  final String decimalSeparator;
 
   /// Allow input of negative numbers?
   final bool allowNegative;
+
   /// Automatically insert decimal point.
   final bool insertDecimalPoint;
+
   /// Always add decimals.
   final bool addDecimalDigits;
+
   /// Allow to change decimal point position?
   final bool overrideDecimalPoint;
-  /// Grouping of 2 or more digits with commas
-  final int? groupIntegerDigits;
 
-  late final String? maxInteger;
-  late final String? maxDecimal;
-  late final int? integerDigits;
-  late final int? decimalDigits;
+  /// Grouping of 2 or more digits with groupIntegerSeparator.
+  final int? groupDigits;
+
+  /// Grouping separator: default is comma.
+  final String groupSeparator;
 
   NumberTextInputFormatter({
     this.prefix,
@@ -32,14 +52,19 @@ class NumberTextInputFormatter extends TextInputFormatter {
     int? integerDigits,
     int? decimalDigits,
     String? maxValue,
-    this.groupIntegerDigits,
+    this.decimalSeparator = '.',
+    this.groupDigits,
+    this.groupSeparator = ',',
     this.allowNegative = false,
     this.overrideDecimalPoint = false,
     this.insertDecimalPoint = false,
     this.addDecimalDigits = false,
   })  : assert(integerDigits == null || integerDigits > 0),
         assert(decimalDigits == null || decimalDigits >= 0),
-        assert(groupIntegerDigits == null || groupIntegerDigits > 1) {
+        assert(decimalSeparator.length == 1),
+        assert(groupDigits == null || groupDigits > 1),
+        assert(groupSeparator.length == 1),
+        assert(decimalSeparator != groupSeparator) {
     String? maxInteger;
     String? maxDecimal;
 
@@ -116,7 +141,9 @@ class CurrencyTextInputFormatter extends NumberTextInputFormatter {
     int decimalDigits = 2,
     String? maxValue,
     bool allowNegative = false,
-    int groupIntegerDigits = 3,
+    String decimalSeparator = '.',
+    int groupDigits = 3,
+    String groupSeparator = ',',
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = true,
     bool addDecimalDigits = false,
@@ -127,7 +154,9 @@ class CurrencyTextInputFormatter extends NumberTextInputFormatter {
           decimalDigits: decimalDigits,
           maxValue: maxValue,
           allowNegative: allowNegative,
-          groupIntegerDigits : groupIntegerDigits,
+          decimalSeparator: decimalSeparator,
+          groupDigits: groupDigits,
+          groupSeparator: groupSeparator,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
           addDecimalDigits: addDecimalDigits,
@@ -141,7 +170,9 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
     int integerDigits = 3,
     int decimalDigits = 0,
     bool allowNegative = false,
-    int? groupIntegerDigits,
+    String decimalSeparator = '.',
+    int? groupDigits,
+    String groupSeparator = ',',
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = false,
     bool addDecimalDigits = true,
@@ -153,7 +184,9 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
           decimalDigits: decimalDigits,
           maxValue: '1${'0' * (integerDigits - 1)}${decimalDigits > 0 ? '.${'0' * decimalDigits}' : ''}',
           allowNegative: allowNegative,
-          groupIntegerDigits: groupIntegerDigits,
+          decimalSeparator: decimalSeparator,
+          groupDigits: groupDigits,
+          groupSeparator: groupSeparator,
           overrideDecimalPoint: overrideDecimalPoint,
           insertDecimalPoint: insertDecimalPoint,
           addDecimalDigits: addDecimalDigits,
