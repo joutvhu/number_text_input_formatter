@@ -40,10 +40,8 @@ class TextNumberFilter {
 
   TextNumberFilter(this.options, this.editor);
 
-  TextNumberFilter setup({
-    bool isRemoving = false,
-  }) {
-    removing = isRemoving;
+  TextNumberFilter prepare(Map<String, dynamic> params) {
+    removing = params['removing'] == true;
     hasDecimalPoint = options.decimalDigits == null || options.decimalDigits! > 0;
     allowDecimalPoint = options.addDecimalDigits || !options.insertDecimalPoint;
     decimalWithoutPoint = hasDecimalPoint && !allowDecimalPoint;
@@ -77,7 +75,7 @@ class TextNumberFilter {
 
   TextValueEditor filter() {
     editor.forEach(filterNext, filterComplete);
-    insertValueAfterFilter();
+    afterFilter();
     return editor;
   }
 
@@ -250,7 +248,7 @@ class TextNumberFilter {
     return allow;
   }
 
-  void insertValueAfterFilter() {
+  void afterFilter() {
     if (decimalPoint != null) {
       if (decimalDigits == 0) {
         insertDecimalDigits();
@@ -261,7 +259,7 @@ class TextNumberFilter {
       }
     }
 
-    groupIntegerDigits();
+    groupDigits();
   }
 
   void insertDecimalDigits() {
@@ -301,7 +299,7 @@ class TextNumberFilter {
     }
   }
 
-  void groupIntegerDigits() {
+  void groupDigits() {
     if (options.groupDigits != null) {
       var index = integerDigits;
       while (true) {

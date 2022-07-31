@@ -112,9 +112,10 @@ class NumberTextInputFormatter extends TextInputFormatter {
   ) {
     if (newValue.text.isEmpty == true) return newValue;
 
-    final bool isRemovedCharacter = oldValue.text.length - 1 == newValue.text.length;
     TextValueEditor state = TextValueEditor(newValue);
-    createFilter(state).setup(isRemoving: isRemovedCharacter).filter();
+    createFilter(state)
+        ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})
+        ..filter();
 
     if (prefix != null) {
       state.prefix(prefix!);
