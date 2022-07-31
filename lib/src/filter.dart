@@ -78,88 +78,91 @@ class TextNumberFilter {
   }
 
   TextValueEditor filter() {
-    editor.forEach((value, index, state) {
-      bool allow = false;
-      if (!numberStarted && options.allowNegative && value == _negative) {
-        allow = true;
-      } else if (!foundDecimalPoint) {
-        if (_number_0 <= value && value <= _number_9) {
-          allow = filterInteger(value, state.index, state);
-        } else if (value == decimalSeparator.codeUnitAt(0)) {
-          allow = filterDecimalPoint(value, state.index, state);
-        }
-      } else {
-        if (_number_0 <= value && value <= _number_9) {
-          allow = filterDecimal(value, state.index, state);
-        } else if (value == decimalSeparator.codeUnitAt(0)) {
-          allow = filterOtherDecimalPoint(value, state.index, state);
-        }
-      }
-      if (allow && !numberStarted) {
-        numberStarted = true;
-      }
-
-      if (allowing != allow || state.index == state.length) {
-        if (!allowing && startPosition < state.index) {
-          state.remove(startPosition, state.index);
-        }
-        startPosition = state.index;
-        allowing = allow;
-      }
-      return true;
-    });
-
-    if (!allowing && startPosition < editor.length) {
-      editor.remove(startPosition, editor.length);
-    }
-    if (hasNumber && integerDigits == 0) {
-      integerDigits = 1;
-      editor.prefix('0');
-    }
-
+    editor.forEach(filterNext, filterComplete);
     insertValueAfterFilter();
-
     return editor;
   }
 
+  bool filterNext(int value, int index, LookupTextValueEditor state) {
+    bool allow = false;
+    if (!numberStarted && options.allowNegative && value == _negative) {
+      allow = true;
+    } else if (!foundDecimalPoint) {
+      if (_number_0 <= value && value <= _number_9) {
+        allow = filterInteger(value, state.index, state);
+      } else if (value == decimalSeparator.codeUnitAt(0)) {
+        allow = filterDecimalPoint(value, state.index, state);
+      }
+    } else {
+      if (_number_0 <= value && value <= _number_9) {
+        allow = filterDecimal(value, state.index, state);
+      } else if (value == decimalSeparator.codeUnitAt(0)) {
+        allow = filterOtherDecimalPoint(value, state.index, state);
+      }
+    }
+    if (allow && !numberStarted) {
+      numberStarted = true;
+    }
+
+    if (allowing != allow || state.index == state.length) {
+      if (!allowing && startPosition < state.index) {
+        state.remove(startPosition, state.index);
+      }
+      startPosition = state.index;
+      allowing = allow;
+    }
+    return true;
+  }
+
+  void filterComplete(int length, LookupTextValueEditor state) {
+    if (!allowing && startPosition < length) {
+      state.remove(startPosition, length);
+    }
+
+    if (hasNumber && integerDigits == 0) {
+      integerDigits = 1;
+      state.prefix('0');
+    }
+  }
+
   bool filterInteger(int value, int index, LookupTextValueEditor state) {
+    var allow = false;
     hasNumber = true;
     if (value != _number_0) foundNumbers = true;
     if (foundNumbers && !limitedInteger) {
       var newIntegerDigits = integerDigits + 1;
       if (maxIntegerDigits == null || newIntegerDigits < maxIntegerDigits!) {
-        integerDigits = newIntegerDigits;
-        return true;
+        allow = true;
       } else if (maxIntegerDigits != null && newIntegerDigits == maxIntegerDigits!) {
-        if (options.maxInteger != null && options.maxInteger!.length == maxIntegerDigits) {
-          var codes = options.maxInteger!.codeUnits;
-          for (int i = 0; i < maxIntegerDigits!; i++) {
-            var code = codes[i];
-            var char = state[i];
-            if (char < code) {
-              integerDigits = newIntegerDigits;
-              return true;
-            } else if (char > code) {
-              limitedInteger = true;
-              return false;
-            }
-          }
-          limitedNumber = true;
-          integerDigits = newIntegerDigits;
-          return true;
-        } else {
-          integerDigits = newIntegerDigits;
-          return true;
-        }
+        allow = filterMaximumInteger(value, state.index, state);
       } else {
-        var allow = filterOverInteger(value, state.index, state);
-        if (allow) {
-          integerDigits++;
-        }
-        return allow;
+        allow = filterOverInteger(value, state.index, state);
       }
     }
-    return false;
+    if (allow) {
+      integerDigits++;
+    }
+    return allow;
+  }
+
+  bool filterMaximumInteger(int value, int index, LookupTextValueEditor state) {
+    if (options.maxInteger != null && options.maxInteger!.length == maxIntegerDigits) {
+      var codes = options.maxInteger!.codeUnits;
+      for (int i = 0; i < maxIntegerDigits!; i++) {
+        var code = codes[i];
+        var char = state[i];
+        if (char < code) {
+          return true;
+        } else if (char > code) {
+          limitedInteger = true;
+          return false;
+        }
+      }
+      limitedNumber = true;
+      return true;
+    } else {
+      return true;
+    }
   }
 
   bool filterOverInteger(int value, int index, LookupTextValueEditor state) {
@@ -184,33 +187,36 @@ class TextNumberFilter {
   }
 
   bool filterDecimal(int value, int index, LookupTextValueEditor state) {
+    var allow = false;
     if (maxDecimalDigits == null || decimalDigits < maxDecimalDigits!) {
       if (maxDecimalDigits == null || value == _number_0) {
-        decimalDigits++;
-        return true;
+        allow = true;
       } else if (limitedDecimal) {
-        return false;
+        allow = false;
       } else if (limitedNumber && options.maxDecimal != null && options.maxDecimal!.length == maxDecimalDigits) {
-        var codes = options.maxDecimal!.codeUnits;
-        var char = codes[state.index - decimalPoint! - 1];
-        if (value < char) {
-          limitedNumber = false;
-          decimalDigits++;
-          return true;
-        } else if (value > char) {
-          limitedDecimal = true;
-          return false;
-        } else {
-          decimalDigits++;
-          return true;
-        }
+        allow = filterMaximumDecimal(value, state.index, state);
       } else {
-        limitedNumber = false;
-        decimalDigits++;
-        return true;
+        allow = true;
       }
     }
-    return false;
+    if (allow) {
+      decimalDigits++;
+    }
+    return allow;
+  }
+
+  bool filterMaximumDecimal(int value, int index, LookupTextValueEditor state) {
+    var codes = options.maxDecimal!.codeUnits;
+    var char = codes[state.index - decimalPoint! - 1];
+    if (value < char) {
+      limitedNumber = false;
+      return true;
+    } else if (value > char) {
+      limitedDecimal = true;
+      return false;
+    } else {
+      return true;
+    }
   }
 
   bool filterOtherDecimalPoint(int value, int index, LookupTextValueEditor state) {
@@ -297,7 +303,7 @@ class TextNumberFilter {
     }
   }
 
-  groupIntegerDigits() {
+  void groupIntegerDigits() {
     if (options.groupDigits != null) {
       var index = integerDigits;
       while (true) {

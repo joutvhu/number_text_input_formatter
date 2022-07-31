@@ -1,5 +1,9 @@
 import 'package:flutter/services.dart';
 
+typedef NextHandler = bool Function(int value, int index, LookupTextValueEditor state);
+
+typedef CompleteHandler = void Function(int length, LookupTextValueEditor state);
+
 abstract class TextValueEditor {
   factory TextValueEditor(TextEditingValue inputValue) => DefaultTextValueEditor(inputValue);
 
@@ -29,7 +33,7 @@ abstract class TextValueEditor {
 
   remove(int start, int end);
 
-  forEach(bool Function(int value, int index, LookupTextValueEditor state) handler);
+  forEach(NextHandler next, [CompleteHandler? complete]);
 
   TextEditingValue finalize();
 }
@@ -71,14 +75,17 @@ class DefaultTextValueEditor implements TextValueEditor {
   }
 
   @override
-  forEach(bool Function(int value, int index, LookupTextValueEditor state) handler) {
+  forEach(NextHandler next, [CompleteHandler? complete]) {
     var state = LookupTextValueEditor._(this);
     do {
-      if (!handler(codeUnits[state.index], state.index, state)) {
+      if (!next(codeUnits[state.index], state.index, state)) {
         break;
       }
       state.index = state.index + 1;
     } while (state.index < length);
+    if (complete != null) {
+      complete(length, state);
+    }
   }
 
   @override
@@ -293,14 +300,17 @@ class LookupTextValueEditor implements TextValueEditor {
   }
 
   @override
-  forEach(bool Function(int value, int index, LookupTextValueEditor state) handler) {
+  forEach(NextHandler next, [CompleteHandler? complete]) {
     var state = LookupTextValueEditor._(this);
     do {
-      if (!handler(codeUnits[state.index], state.index, state)) {
+      if (!next(codeUnits[state.index], state.index, state)) {
         break;
       }
       state.index = state.index + 1;
     } while (state.index < length);
+    if (complete != null) {
+      complete(length, state);
+    }
   }
 
   @override
