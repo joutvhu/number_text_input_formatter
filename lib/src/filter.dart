@@ -102,6 +102,9 @@ class TextNumberFilter {
 
     if (allowing != allow || state.index == state.length) {
       if (!allowing && startPosition < state.index) {
+        if (decimalPoint == state.index) {
+          decimalPoint = startPosition;
+        }
         state.remove(startPosition, state.index);
       }
       startPosition = state.index;

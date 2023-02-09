@@ -667,7 +667,7 @@ void main() {
         text: '',
       ),
       const TextEditingValue(
-        text: '8045t.g8.u5',
+        text: '804y5.g8.u5',
       ),
     );
     expect(result.text, '80458.5');
