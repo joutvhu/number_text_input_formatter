@@ -113,7 +113,7 @@ class NumberTextInputFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty == true) return newValue;
 
     TextValueEditor state = TextValueEditor(newValue);
-    createFilter(state)
+    TextNumberFilter(this, state)
         ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})
         ..filter();
 
@@ -127,10 +127,6 @@ class NumberTextInputFormatter extends TextInputFormatter {
     }
 
     return state.finalize();
-  }
-
-  TextNumberFilter createFilter(TextValueEditor state) {
-    return TextNumberFilter(this, state);
   }
 }
 

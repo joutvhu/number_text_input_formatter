@@ -146,7 +146,7 @@ class TextNumberFilter {
       var codes = options.maxInteger!.codeUnits;
       for (int i = 0; i < maxIntegerDigits!; i++) {
         var code = codes[i];
-        var char = state[i];
+        var char = !allowing && i >= startPosition ? state[state.index + i - startPosition] : state[i];
         if (char < code) {
           return true;
         } else if (char > code) {
