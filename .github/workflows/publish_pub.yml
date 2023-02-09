@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Run tests
+        run: flutter test --machine test
+
       - name: Setup Credentials
         uses: joutvhu/write-file@v1
         with:
