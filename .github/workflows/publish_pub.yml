@@ -11,15 +11,26 @@ on:
       - created
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    container:
-      image:  google/dart:latest
     steps:
       - uses: actions/checkout@v3
 
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.7.3'
+          channel: 'stable'
+
       - name: Run tests
         run: flutter test --machine test
+
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v3
 
       - name: Setup Credentials
         uses: joutvhu/write-file@v1
