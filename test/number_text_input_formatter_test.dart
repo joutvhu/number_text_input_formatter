@@ -296,6 +296,22 @@ void main() {
     expect(result.text, '1.4');
   });
 
+  test('decimal_part_greater_than_max_value_5', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 2,
+      decimalDigits: 2,
+      maxValue: '1.33'
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.41',
+      ),
+    );
+    expect(result.text, '1.00');
+  });
+
   test('decimal_part_less_than_max_value_1', () {
     var result = NumberTextInputFormatter(
       integerDigits: 1,
@@ -737,6 +753,38 @@ void main() {
       ),
     );
     expect(result.text, '804583.60');
+  });
+
+  test('filter_other_decimal_point_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      overrideDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.3a.66',
+      ),
+    );
+    expect(result.text, '13.66');
+  });
+
+  test('filter_other_decimal_point_2', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      overrideDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '0.3.66',
+      ),
+    );
+    expect(result.text, '3.66');
   });
 
   test('currency_text_input_formatter_1', () {
