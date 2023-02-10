@@ -33,7 +33,7 @@ class TextNumberFilter {
   int decimalDigits = 0;
   bool limitedNumber = false;
   bool limitedInteger = false;
-  bool limitedDecimal = false;
+  bool? limitedDecimal;
   bool numberStarted = false;
   bool hasNumber = false;
   bool foundNumbers = false;
@@ -65,7 +65,7 @@ class TextNumberFilter {
     decimalDigits = 0;
     limitedNumber = false;
     limitedInteger = false;
-    limitedDecimal = false;
+    limitedDecimal = null;
     numberStarted = false;
     hasNumber = false;
     foundNumbers = false;
@@ -188,9 +188,11 @@ class TextNumberFilter {
   bool filterDecimal(int value, int index, LookupTextValueEditor state) {
     var allow = false;
     if (maxDecimalDigits == null || decimalDigits < maxDecimalDigits!) {
-      if (maxDecimalDigits == null || value == _number_0) {
+      if (maxDecimalDigits == null) {
         allow = true;
-      } else if (limitedDecimal) {
+      } else if (limitedDecimal == false) {
+        allow = true;
+      } else if (limitedDecimal == true) {
         allow = false;
       } else if (limitedNumber && options.maxDecimal != null && options.maxDecimal!.length == maxDecimalDigits) {
         allow = filterMaximumDecimal(value, state.index, state);
@@ -209,6 +211,7 @@ class TextNumberFilter {
     var char = codes[state.index - decimalPoint! - 1];
     if (value < char) {
       limitedNumber = false;
+      limitedDecimal = false;
       return true;
     } else if (value > char) {
       limitedDecimal = true;

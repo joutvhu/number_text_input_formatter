@@ -10,3 +10,8 @@
 ## 1.0.0+2
 
 - Fix maxValue issue.
+
+
+## 1.0.0+3
+
+- Fix maxDecimal issue.

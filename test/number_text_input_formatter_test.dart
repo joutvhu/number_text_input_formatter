@@ -97,7 +97,7 @@ void main() {
         selection: TextSelection.collapsed(offset: 4),
       ),
     );
-    expect(result.text, '1.00');
+    expect(result.text, '1.05');
   });
 
   test('overflow_decimal_part_2', () {
@@ -115,7 +115,7 @@ void main() {
         selection: TextSelection.collapsed(offset: 5),
       ),
     );
-    expect(result.text, '1.00');
+    expect(result.text, '1.05');
   });
 
   test('integer_part_greater_than_max_value_1', () {
@@ -154,7 +154,7 @@ void main() {
     expect(result.text, '0');
   });
 
-  test('integer_part_greater_than_maxValue_3', () {
+  test('integer_part_greater_than_max_value_3', () {
     var result = NumberTextInputFormatter(
       integerDigits: 2,
       decimalDigits: 2,
@@ -172,7 +172,7 @@ void main() {
     expect(result.text, '1');
   });
 
-  test('integer_part_greater_than_maxValue_4', () {
+  test('integer_part_greater_than_max_value_4', () {
     var result = NumberTextInputFormatter(
       integerDigits: 2,
       decimalDigits: 2,
@@ -190,7 +190,7 @@ void main() {
     expect(result.text, '1');
   });
 
-  test('integer_part_greater_than_maxValue_5', () {
+  test('integer_part_greater_than_max_value_5', () {
     var result = NumberTextInputFormatter(
       integerDigits: 3,
       decimalDigits: 2,
@@ -208,7 +208,7 @@ void main() {
     expect(result.text, '10');
   });
 
-  test('integer_part_greater_than_maxValue_6', () {
+  test('integer_part_greater_than_max_value_6', () {
     var result = NumberTextInputFormatter(
       maxValue: '100.09',
     ).formatEditUpdate(
@@ -294,6 +294,54 @@ void main() {
       ),
     );
     expect(result.text, '1.4');
+  });
+
+  test('decimal_part_greater_than_max_value_5', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 2,
+      decimalDigits: 2,
+      maxValue: '1.33'
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.41',
+      ),
+    );
+    expect(result.text, '1.00');
+  });
+
+  test('decimal_part_less_than_max_value_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 1,
+      decimalDigits: 2,
+      maxValue: '1.33',
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.09',
+      ),
+    );
+    expect(result.text, '1.09');
+  });
+
+  test('decimal_part_less_than_max_value_2', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 1,
+      decimalDigits: 2,
+      maxValue: '1.33',
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.19',
+      ),
+    );
+    expect(result.text, '1.19');
   });
 
   test('change_decimal_separator_1', () {
@@ -705,6 +753,38 @@ void main() {
       ),
     );
     expect(result.text, '804583.60');
+  });
+
+  test('filter_other_decimal_point_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      overrideDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '1.3a.66',
+      ),
+    );
+    expect(result.text, '13.66');
+  });
+
+  test('filter_other_decimal_point_2', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      overrideDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '0.3.66',
+      ),
+    );
+    expect(result.text, '3.66');
   });
 
   test('currency_text_input_formatter_1', () {
