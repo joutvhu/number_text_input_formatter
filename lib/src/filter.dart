@@ -75,7 +75,6 @@ class TextNumberFilter {
 
   TextValueEditor filter() {
     editor.forEach(filterNext, filterComplete);
-    afterFilter();
     return editor;
   }
 
@@ -118,9 +117,20 @@ class TextNumberFilter {
       state.remove(startPosition, length);
     }
 
-    if (hasNumber && integerDigits == 0) {
-      integerDigits = 1;
-      state.prefix('0');
+    insertIntegerDigits();
+
+    if (editor.isNotEmpty) {
+      if (decimalPoint != null) {
+        if (decimalDigits == 0) {
+          insertDecimalDigits();
+        }
+      } else {
+        if (hasDecimalPoint) {
+          insertDecimalPoint();
+        }
+      }
+
+      groupDigits();
     }
   }
 
@@ -174,8 +184,10 @@ class TextNumberFilter {
         if (!allowing && startPosition < state.index) {
           state.remove(startPosition, state.index);
         }
-        state.prefix('0');
-        integerDigits = 1;
+        if (options.fixNumber) {
+          state.prefix('0');
+          integerDigits = 1;
+        }
         allowing = true;
         startPosition = state.index;
       }
@@ -254,25 +266,18 @@ class TextNumberFilter {
     return allow;
   }
 
-  void afterFilter() {
-    if (editor.isNotEmpty) {
-      if (decimalPoint != null) {
-        if (decimalDigits == 0) {
-          insertDecimalDigits();
-        }
-      } else {
-        if (hasDecimalPoint) {
-          insertDecimalPoint();
-        }
+  void insertIntegerDigits() {
+    if ((decimalPoint != null || hasNumber) && integerDigits == 0) {
+      if (!removing && options.fixNumber) {
+        integerDigits = 1;
+        editor.prefix('0');
       }
-
-      groupDigits();
     }
   }
 
   void insertDecimalDigits() {
     decimalPoint ??= editor.length - 1;
-    if (!removing) {
+    if (!removing && (options.fixNumber || options.insertDecimalDigits)) {
       decimalDigits = options.decimalDigits ?? 1;
       editor.suffix('0' * decimalDigits);
     }
