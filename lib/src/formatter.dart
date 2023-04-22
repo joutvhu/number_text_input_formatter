@@ -31,6 +31,10 @@ class NumberTextInputFormatter extends TextInputFormatter {
   /// Allow input of negative numbers?
   final bool allowNegative;
 
+  /// Insert 0 before the decimal point if the number starts with a decimal point
+  /// Insert 0 after the decimal point if the number ends with a decimal point
+  final bool fixNumber;
+
   /// Automatically insert decimal point.
   final bool insertDecimalPoint;
 
@@ -57,6 +61,7 @@ class NumberTextInputFormatter extends TextInputFormatter {
     this.groupSeparator = ',',
     this.allowNegative = false,
     this.overrideDecimalPoint = false,
+    this.fixNumber = true,
     this.insertDecimalPoint = false,
     this.insertDecimalDigits = false,
   })  : assert(integerDigits == null || integerDigits > 0),

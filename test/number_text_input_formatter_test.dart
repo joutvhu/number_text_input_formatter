@@ -755,6 +755,22 @@ void main() {
     expect(result.text, '804583.60');
   });
 
+  test('override_decimal_point_10', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 2,
+      decimalDigits: 2,
+      insertDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '58',
+      ),
+    );
+    expect(result.text, '0.58');
+  });
+
   test('filter_other_decimal_point_1', () {
     var result = NumberTextInputFormatter(
       integerDigits: 13,
@@ -785,6 +801,38 @@ void main() {
       ),
     );
     expect(result.text, '3.66');
+  });
+
+  test('filter_fix_number_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 12,
+      groupDigits: 3,
+      fixNumber: false
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '11',
+      ),
+      const TextEditingValue(
+        text: '11.',
+      ),
+    );
+    expect(result.text, '11.');
+  });
+
+  test('filter_fix_number_2', () {
+    var result = NumberTextInputFormatter(
+        integerDigits: 12,
+        groupDigits: 3,
+        fixNumber: false
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '11',
+      ),
+      const TextEditingValue(
+        text: '.11',
+      ),
+    );
+    expect(result.text, '.11');
   });
 
   test('currency_text_input_formatter_1', () {
