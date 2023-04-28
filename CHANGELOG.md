@@ -1,3 +1,7 @@
+## 1.0.0+5
+
+- Fix group of negative numbers.
+
 ## 1.0.0+4
 
 - Allow disable fix number.
