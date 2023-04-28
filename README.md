@@ -7,7 +7,7 @@ Number Text Input Formatter for Flutter.
 ```yaml
 # Add into pubspec.yaml
 dependencies:
-  number_text_input_formatter: ^1.0.0+1
+  number_text_input_formatter: ^lastVersion
 ```
 
 ## Usage
