@@ -1,6 +1,10 @@
+## 1.0.0+6
+
+- Fix insertDecimalPoint with negative number.
+
 ## 1.0.0+5
 
-- Fix group of negative numbers.
+- Fix group of negative number.
 
 ## 1.0.0+4
 

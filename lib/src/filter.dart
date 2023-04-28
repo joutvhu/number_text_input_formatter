@@ -272,7 +272,11 @@ class TextNumberFilter {
     if ((decimalPoint != null || hasNumber) && integerDigits == 0) {
       if (!removing && options.fixNumber) {
         integerDigits = 1;
-        editor.prefix('0');
+        if (isNegative) {
+          editor.insert(1, '0');
+        } else {
+          editor.prefix('0');
+        }
       }
     }
   }
@@ -293,22 +297,27 @@ class TextNumberFilter {
         editor.suffix('$decimalSeparator${'0' * decimalDigits}');
       }
     } else if (options.insertDecimalPoint) {
-      if (editor.length > options.decimalDigits!) {
+      if (integerDigits > options.decimalDigits!) {
         decimalPoint = editor.length - options.decimalDigits!;
-        integerDigits = decimalPoint!;
+        integerDigits = decimalPoint! - (isNegative ? 1 : 0);
         decimalDigits = options.decimalDigits!;
         editor.insert(decimalPoint!, decimalSeparator);
       } else {
-        if (!removing || editor.length > 1 || (editor.length == 1 && editor[0] != _number_0)) {
-          var missingNumber = options.decimalDigits! - editor.length;
+        if (!removing || integerDigits > 1 || (integerDigits == 1 && editor[isNegative ? 1 : 0] != _number_0)) {
+          var missingNumber = options.decimalDigits! - integerDigits;
           var missingInteger = '0$decimalSeparator';
           if (missingNumber > 0) {
             missingInteger += '0' * missingNumber;
           }
           integerDigits = 1;
           decimalDigits = options.decimalDigits!;
-          decimalPoint = 1;
-          editor.prefix(missingInteger);
+          if (isNegative) {
+            decimalPoint = 2;
+            editor.insert(1, missingInteger);
+          } else {
+            decimalPoint = 1;
+            editor.prefix(missingInteger);
+          }
         }
       }
     }
