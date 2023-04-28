@@ -410,6 +410,56 @@ void main() {
     expect(result.text, '-2454.41');
   });
 
+  test('allow_negative_4', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      groupDigits: 3,
+      allowNegative: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-245.41',
+      ),
+    );
+    expect(result.text, '-245.41');
+  });
+
+  test('allow_negative_5', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      groupDigits: 3,
+      allowNegative: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-2405.41',
+      ),
+    );
+    expect(result.text, '-2,405.41');
+  });
+
+  test('allow_negative_6', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '--245.41',
+      ),
+    );
+    expect(result.text, '-245.41');
+  });
+
   test('insert_decimal_point_1', () {
     var result = NumberTextInputFormatter(
       integerDigits: 13,

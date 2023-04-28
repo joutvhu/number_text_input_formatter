@@ -34,6 +34,7 @@ class TextNumberFilter {
   bool limitedNumber = false;
   bool limitedInteger = false;
   bool? limitedDecimal;
+  bool isNegative = false;
   bool numberStarted = false;
   bool hasNumber = false;
   bool foundNumbers = false;
@@ -81,6 +82,7 @@ class TextNumberFilter {
   bool filterNext(int value, int index, LookupTextValueEditor state) {
     bool allow = false;
     if (!numberStarted && options.allowNegative && value == _negative) {
+      isNegative = true;
       allow = true;
     } else if (decimalPoint == null) {
       if (_number_0 <= value && value <= _number_9) {
@@ -315,9 +317,14 @@ class TextNumberFilter {
   void groupDigits() {
     if (options.groupDigits != null) {
       var index = integerDigits;
+      var startPoint = 0;
+      if (isNegative) {
+        index += 1;
+        startPoint = 1;
+      }
       while (true) {
         index -= options.groupDigits!;
-        if (index < 1) {
+        if (index <= startPoint) {
           break;
         }
         editor.insert(index, groupSeparator);
