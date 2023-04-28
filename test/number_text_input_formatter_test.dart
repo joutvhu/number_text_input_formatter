@@ -460,6 +460,105 @@ void main() {
     expect(result.text, '-245.41');
   });
 
+  test('allow_negative_7', () {
+    var result = CurrencyTextInputFormatter(
+      allowNegative: true,
+      prefix: '€ ',
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-345.24',
+      ),
+    );
+    expect(result.text, '€ -345.24');
+  });
+
+  test('allow_negative_8', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+      insertDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-4',
+      ),
+    );
+    expect(result.text, '-0.04');
+  });
+
+  test('allow_negative_9', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+      insertDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-0',
+      ),
+    );
+    expect(result.text, '-0.00');
+  });
+
+  test('allow_negative_10', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+      insertDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '-01',
+      ),
+      const TextEditingValue(
+        text: '-0',
+      ),
+    );
+    expect(result.text, '-');
+  });
+
+  test('allow_negative_11', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+      insertDecimalPoint: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '-0',
+      ),
+      const TextEditingValue(
+        text: '-',
+      ),
+    );
+    expect(result.text, '-');
+  });
+
+  test('allow_negative_12', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      decimalDigits: 2,
+      allowNegative: true,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-10.',
+      ),
+    );
+    expect(result.text, '-10.00');
+  });
+
   test('insert_decimal_point_1', () {
     var result = NumberTextInputFormatter(
       integerDigits: 13,
