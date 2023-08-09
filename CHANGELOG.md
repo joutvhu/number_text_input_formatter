@@ -1,3 +1,7 @@
+## 1.0.0+7
+
+- Bump SDK version
+
 ## 1.0.0+6
 
 - Fix insertDecimalPoint with negative number.
