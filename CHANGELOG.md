@@ -1,3 +1,7 @@
+## 1.0.0+8
+
+- Fix insert integer digit
+
 ## 1.0.0+7
 
 - Bump SDK version
