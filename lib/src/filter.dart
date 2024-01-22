@@ -186,10 +186,6 @@ class TextNumberFilter {
         if (!allowing && startPosition < state.index) {
           state.remove(startPosition, state.index);
         }
-        if (options.fixNumber) {
-          state.prefix('0');
-          integerDigits = 1;
-        }
         allowing = true;
         startPosition = state.index;
       }

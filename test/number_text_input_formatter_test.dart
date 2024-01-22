@@ -1011,4 +1011,62 @@ void main() {
     );
     expect(result.text, '14%');
   });
+
+  test('percentage_text_input_formatter_2', () {
+    var result = PercentageTextInputFormatter(
+      integerDigits: 12,
+      decimalDigits: 2,
+      decimalSeparator: '.',
+      groupDigits: 3,
+      groupSeparator: ',',
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '.',
+      ),
+    );
+    expect(result.text, '0.00');
+  });
+
+  test('percentage_text_input_formatter_3', () {
+    var result = PercentageTextInputFormatter(
+      integerDigits: 12,
+      decimalDigits: 2,
+      decimalSeparator: '.',
+      groupDigits: 3,
+      groupSeparator: ',',
+      allowNegative: true,
+      overrideDecimalPoint: false,
+      insertDecimalPoint: false,
+      insertDecimalDigits: false,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '-.',
+      ),
+    );
+    expect(result.text, '-0.00');
+  });
+
+  test('percentage_text_input_formatter_4', () {
+    var result = PercentageTextInputFormatter(
+      integerDigits: 12,
+      decimalDigits: 2,
+      decimalSeparator: '.',
+      groupDigits: 3,
+      groupSeparator: ',',
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '',
+      ),
+      const TextEditingValue(
+        text: '.24',
+      ),
+    );
+    expect(result.text, '0.24');
+  });
 }
