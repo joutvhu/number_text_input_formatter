@@ -297,9 +297,7 @@ void main() {
   });
 
   test('decimal_part_greater_than_max_value_5', () {
-    var result = NumberTextInputFormatter(
-            integerDigits: 2, decimalDigits: 2, maxValue: '1.33')
-        .formatEditUpdate(
+    var result = NumberTextInputFormatter(integerDigits: 2, decimalDigits: 2, maxValue: '1.33').formatEditUpdate(
       const TextEditingValue(
         text: '',
       ),
@@ -951,9 +949,7 @@ void main() {
   });
 
   test('filter_fix_number_1', () {
-    var result = NumberTextInputFormatter(
-            integerDigits: 12, groupDigits: 3, fixNumber: false)
-        .formatEditUpdate(
+    var result = NumberTextInputFormatter(integerDigits: 12, groupDigits: 3, fixNumber: false).formatEditUpdate(
       const TextEditingValue(
         text: '11',
       ),
@@ -965,9 +961,7 @@ void main() {
   });
 
   test('filter_fix_number_2', () {
-    var result = NumberTextInputFormatter(
-            integerDigits: 12, groupDigits: 3, fixNumber: false)
-        .formatEditUpdate(
+    var result = NumberTextInputFormatter(integerDigits: 12, groupDigits: 3, fixNumber: false).formatEditUpdate(
       const TextEditingValue(
         text: '11',
       ),
@@ -1366,5 +1360,53 @@ void main() {
       ),
     );
     expect(result.text, '791,251.41');
+  });
+
+  // fixNumber: false — input zero into empty field
+  test('fix_number_false_zero_1', () {
+    // typing "0" into empty field should produce "0"
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      fixNumber: false,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '0'),
+    );
+    expect(result.text, '0');
+  });
+
+  test('fix_number_false_zero_2', () {
+    // leading zeros should still be stripped: "007" → "7"
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      fixNumber: false,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '007'),
+    );
+    expect(result.text, '7');
+  });
+
+  test('fix_number_false_zero_3', () {
+    // "0" followed by another digit should strip the leading zero: "05" → "5"
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      fixNumber: false,
+    ).formatEditUpdate(
+      const TextEditingValue(text: '0'),
+      const TextEditingValue(text: '05'),
+    );
+    expect(result.text, '5');
+  });
+
+  test('fix_number_false_zero_4', () {
+    // fixNumber: true (default) should still work normally
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '0'),
+    );
+    expect(result.text, '0');
   });
 }

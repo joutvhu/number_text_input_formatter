@@ -263,6 +263,15 @@ class TextNumberFilter {
         } else {
           editor.prefix('0');
         }
+      } else if (!removing && !options.fixNumber && hasNumber && !foundNumbers) {
+        // All entered digits were zeros (e.g. "0" or "00") and fixNumber is
+        // false. Preserve a single "0" so the field is not left empty.
+        integerDigits = 1;
+        if (isNegative) {
+          editor.insert(1, '0');
+        } else {
+          editor.prefix('0');
+        }
       }
     }
   }
