@@ -84,7 +84,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
           if (maxInteger.length <= integerDigits) {
             integerDigits = maxInteger.length;
           } else {
-            maxInteger = maxInteger.substring(maxInteger.length - integerDigits);
+            maxInteger =
+                maxInteger.substring(maxInteger.length - integerDigits);
           }
         }
       } else {
@@ -106,7 +107,9 @@ class NumberTextInputFormatter extends TextInputFormatter {
 
     this.maxInteger = maxInteger;
     this.maxDecimal = maxDecimal;
+    // ignore: prefer_initializing_formals
     this.integerDigits = integerDigits;
+    // ignore: prefer_initializing_formals
     this.decimalDigits = decimalDigits;
   }
 
@@ -184,7 +187,8 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
           suffix: suffix,
           integerDigits: integerDigits,
           decimalDigits: decimalDigits,
-          maxValue: '1${'0' * (integerDigits - 1)}${decimalDigits > 0 ? '.${'0' * decimalDigits}' : ''}',
+          maxValue:
+              '1${'0' * (integerDigits - 1)}${decimalDigits > 0 ? '.${'0' * decimalDigits}' : ''}',
           allowNegative: allowNegative,
           decimalSeparator: decimalSeparator,
           groupDigits: groupDigits,

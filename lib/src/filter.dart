@@ -1,17 +1,7 @@
 part of 'formatter.dart';
 
-const _comma = 44;
 const _negative = 45;
-const _dot = 46;
 const _number_0 = 48;
-const _number_1 = 49;
-const _number_2 = 50;
-const _number_3 = 51;
-const _number_4 = 52;
-const _number_5 = 53;
-const _number_6 = 54;
-const _number_7 = 55;
-const _number_8 = 56;
 const _number_9 = 57;
 
 class TextNumberFilter {
