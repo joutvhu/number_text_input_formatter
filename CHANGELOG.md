@@ -1,3 +1,12 @@
+## 1.0.0+9
+
+- Fix `_fixIndex` not returning clamped value in `LookupTextValueEditor`.
+- Remove unused constants (`_comma`, `_dot`, `_number_1` through `_number_8`) in filter.
+- Add return types to all methods in `TextValueEditor`, `DefaultTextValueEditor`, and `LookupTextValueEditor`.
+- Fix `PercentageTextInputFormatter` assert to use `>= 3` instead of `> 2`.
+- Update README with full parameter documentation and fix syntax error in example.
+- Add 21 new test cases covering prefix/suffix, groupDigits, decimalDigits: 0, maxValue, allowNegative: false, CurrencyTextInputFormatter, and PercentageTextInputFormatter.
+
 ## 1.0.0+8
 
 - Fix insert integer digit

@@ -27,17 +27,17 @@ abstract class TextValueEditor {
 
   String? at(int index);
 
-  prefix(String value);
+  void prefix(String value);
 
-  suffix(String value);
+  void suffix(String value);
 
-  insert(int index, String value);
+  void insert(int index, String value);
 
-  replace(int start, int end, String value);
+  void replace(int start, int end, String value);
 
-  remove(int start, int end);
+  void remove(int start, int end);
 
-  forEach(NextHandler next, [CompleteHandler? complete]);
+  void forEach(NextHandler next, [CompleteHandler? complete]);
 
   TextEditingValue finalize();
 }
@@ -85,7 +85,7 @@ class DefaultTextValueEditor implements TextValueEditor {
   }
 
   @override
-  forEach(NextHandler next, [CompleteHandler? complete]) {
+  void forEach(NextHandler next, [CompleteHandler? complete]) {
     var state = LookupTextValueEditor._(this);
     do {
       if (!next(codeUnits[state.index], state.index, state)) {
@@ -99,26 +99,26 @@ class DefaultTextValueEditor implements TextValueEditor {
   }
 
   @override
-  prefix(String value) {
+  void prefix(String value) {
     codeUnits.insertAll(0, value.codeUnits);
     _adjustIndex(0, 0, value.codeUnits.length, true);
   }
 
   @override
-  suffix(String value) {
+  void suffix(String value) {
     codeUnits.insertAll(length, value.codeUnits);
     _adjustIndex(length, length, value.codeUnits.length, false);
   }
 
   @override
-  insert(int index, String value) {
+  void insert(int index, String value) {
     assert(index <= length);
     codeUnits.insertAll(index, value.codeUnits);
     _adjustIndex(index, index, value.codeUnits.length);
   }
 
   @override
-  replace(int start, int end, String value) {
+  void replace(int start, int end, String value) {
     assert(start <= end);
     assert(end <= length);
     codeUnits.removeRange(start, end);
@@ -127,14 +127,14 @@ class DefaultTextValueEditor implements TextValueEditor {
   }
 
   @override
-  remove(int start, int end) {
+  void remove(int start, int end) {
     assert(start <= end);
     assert(end <= length);
     codeUnits.removeRange(start, end);
     _adjustIndex(start, end, 0);
   }
 
-  _adjustIndex(
+  void _adjustIndex(
     int regionStart,
     int regionEnd,
     int length, [
@@ -236,39 +236,39 @@ class LookupTextValueEditor implements TextValueEditor {
   }
 
   @override
-  prefix(String value) {
+  void prefix(String value) {
     index += value.length;
-    return editor.prefix(value);
+    editor.prefix(value);
   }
 
   @override
-  suffix(String value) {
+  void suffix(String value) {
     if (index == length) {
       index += value.length;
     }
-    return editor.suffix(value);
+    editor.suffix(value);
   }
 
   @override
-  insert(int index, String value) {
+  void insert(int index, String value) {
     index = _fixIndex(index);
     if (index <= this.index) {
-      index += value.length;
+      this.index += value.length;
     }
-    return editor.insert(index, value);
+    editor.insert(index, value);
   }
 
-  insertBefore(String value) {
+  void insertBefore(String value) {
     index += value.length;
-    return editor.insert(index, value);
+    editor.insert(index, value);
   }
 
-  insertAfter(String value) {
-    return editor.insert(index, value);
+  void insertAfter(String value) {
+    editor.insert(index, value);
   }
 
   @override
-  replace(int start, int end, String value) {
+  void replace(int start, int end, String value) {
     start = _fixIndex(start);
     end = _fixIndex(end);
     if (start > end) {
@@ -283,11 +283,11 @@ class LookupTextValueEditor implements TextValueEditor {
         index = value.length + start;
       }
     }
-    return editor.replace(start, end, value);
+    editor.replace(start, end, value);
   }
 
   @override
-  remove(int start, int end) {
+  void remove(int start, int end) {
     start = _fixIndex(start);
     end = _fixIndex(end);
     if (start > end) {
@@ -302,21 +302,21 @@ class LookupTextValueEditor implements TextValueEditor {
         index = start;
       }
     }
-    return editor.remove(start, end);
+    editor.remove(start, end);
   }
 
-  _fixIndex(int index) {
+  int _fixIndex(int index) {
     if (index < 0) {
-      index = 0;
+      return 0;
     } else if (index > length) {
-      index = length;
+      return length;
     } else {
       return index;
     }
   }
 
   @override
-  forEach(NextHandler next, [CompleteHandler? complete]) {
+  void forEach(NextHandler next, [CompleteHandler? complete]) {
     var state = LookupTextValueEditor._(this);
     do {
       if (!next(codeUnits[state.index], state.index, state)) {

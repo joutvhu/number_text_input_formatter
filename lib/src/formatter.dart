@@ -119,8 +119,8 @@ class NumberTextInputFormatter extends TextInputFormatter {
 
     TextValueEditor state = TextValueEditor(newValue);
     TextNumberFilter(this, state)
-        ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})
-        ..filter();
+      ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})
+      ..filter();
 
     if (state.isNotEmpty) {
       if (prefix != null) {
@@ -178,7 +178,7 @@ class PercentageTextInputFormatter extends NumberTextInputFormatter {
     bool overrideDecimalPoint = false,
     bool insertDecimalPoint = false,
     bool insertDecimalDigits = true,
-  })  : assert(integerDigits > 2),
+  })  : assert(integerDigits >= 3),
         super(
           prefix: prefix,
           suffix: suffix,

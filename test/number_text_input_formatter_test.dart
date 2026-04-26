@@ -298,10 +298,8 @@ void main() {
 
   test('decimal_part_greater_than_max_value_5', () {
     var result = NumberTextInputFormatter(
-      integerDigits: 2,
-      decimalDigits: 2,
-      maxValue: '1.33'
-    ).formatEditUpdate(
+            integerDigits: 2, decimalDigits: 2, maxValue: '1.33')
+        .formatEditUpdate(
       const TextEditingValue(
         text: '',
       ),
@@ -954,10 +952,8 @@ void main() {
 
   test('filter_fix_number_1', () {
     var result = NumberTextInputFormatter(
-      integerDigits: 12,
-      groupDigits: 3,
-      fixNumber: false
-    ).formatEditUpdate(
+            integerDigits: 12, groupDigits: 3, fixNumber: false)
+        .formatEditUpdate(
       const TextEditingValue(
         text: '11',
       ),
@@ -970,10 +966,8 @@ void main() {
 
   test('filter_fix_number_2', () {
     var result = NumberTextInputFormatter(
-        integerDigits: 12,
-        groupDigits: 3,
-        fixNumber: false
-    ).formatEditUpdate(
+            integerDigits: 12, groupDigits: 3, fixNumber: false)
+        .formatEditUpdate(
       const TextEditingValue(
         text: '11',
       ),
@@ -985,9 +979,7 @@ void main() {
   });
 
   test('currency_text_input_formatter_1', () {
-    var result = CurrencyTextInputFormatter(
-      prefix: '\$'
-    ).formatEditUpdate(
+    var result = CurrencyTextInputFormatter(prefix: '\$').formatEditUpdate(
       const TextEditingValue(
         text: '',
       ),
@@ -1068,5 +1060,241 @@ void main() {
       ),
     );
     expect(result.text, '0.24');
+  });
+
+  // prefix / suffix
+  test('prefix_suffix_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+      prefix: '\$ ',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '1234'),
+    );
+    expect(result.text, '\$ 1234');
+  });
+
+  test('prefix_suffix_2', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+      suffix: ' USD',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '1234'),
+    );
+    expect(result.text, '1234 USD');
+  });
+
+  test('prefix_suffix_3', () {
+    // prefix and suffix should not be added when result is empty
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+      prefix: '\$ ',
+      suffix: ' USD',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: 'abc'),
+    );
+    expect(result.text, '');
+  });
+
+  // empty input
+  test('empty_input_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+    ).formatEditUpdate(
+      const TextEditingValue(text: '5'),
+      const TextEditingValue(text: ''),
+    );
+    expect(result.text, '');
+  });
+
+  // group digits
+  test('group_digits_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 3,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '1234567'),
+    );
+    expect(result.text, '1,234,567');
+  });
+
+  test('group_digits_2', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 3,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '123'),
+    );
+    expect(result.text, '123');
+  });
+
+  test('group_digits_3', () {
+    // group of 2
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 2,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '123456'),
+    );
+    expect(result.text, '12,34,56');
+  });
+
+  // fix_number
+  test('fix_number_leading_decimal_1', () {
+    // fixNumber: true should prepend 0 before leading dot
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '.5'),
+    );
+    expect(result.text, '0.5');
+  });
+
+  test('fix_number_trailing_decimal_1', () {
+    // fixNumber: true should keep trailing dot as-is (no decimal digits appended unless insertDecimalDigits)
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+      fixNumber: true,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '5.'),
+    );
+    expect(result.text, '5.00');
+  });
+
+  // decimalDigits: 0 (integer only)
+  test('decimal_digits_zero_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 0,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '123.45'),
+    );
+    expect(result.text, '12345');
+  });
+
+  test('decimal_digits_zero_2', () {
+    // decimal separator should be rejected when decimalDigits is 0
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 0,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '99.'),
+    );
+    expect(result.text, '99');
+  });
+
+  // maxValue only (no explicit integerDigits / decimalDigits)
+  test('max_value_only_1', () {
+    var result = NumberTextInputFormatter(
+      maxValue: '999.99',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '1000'),
+    );
+    expect(result.text, '100');
+  });
+
+  test('max_value_only_2', () {
+    var result = NumberTextInputFormatter(
+      maxValue: '999.99',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '500.12'),
+    );
+    expect(result.text, '500.12');
+  });
+
+  // allow_negative: false (default) — negative sign should be stripped
+  test('disallow_negative_1', () {
+    var result = NumberTextInputFormatter(
+      integerDigits: 10,
+      decimalDigits: 2,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '-123.45'),
+    );
+    expect(result.text, '123.45');
+  });
+
+  // CurrencyTextInputFormatter
+  test('currency_text_input_formatter_2', () {
+    // no input → empty
+    var result = CurrencyTextInputFormatter().formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: ''),
+    );
+    expect(result.text, '');
+  });
+
+  test('currency_text_input_formatter_3', () {
+    // suffix variant
+    var result = CurrencyTextInputFormatter(
+      suffix: ' VND',
+      groupDigits: 3,
+      groupSeparator: '.',
+      decimalSeparator: ',',
+      decimalDigits: 0,
+      insertDecimalPoint: false,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '1500000'),
+    );
+    expect(result.text, '1.500.000 VND');
+  });
+
+  test('currency_text_input_formatter_4', () {
+    // negative currency
+    var result = CurrencyTextInputFormatter(
+      allowNegative: true,
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '-5000'),
+    );
+    expect(result.text, '-50.00');
+  });
+
+  // PercentageTextInputFormatter
+  test('percentage_text_input_formatter_5', () {
+    // value at exact max (100) should be allowed
+    var result = PercentageTextInputFormatter().formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '100'),
+    );
+    expect(result.text, '100');
+  });
+
+  test('percentage_text_input_formatter_6', () {
+    // value above max (101) should be clamped
+    var result = PercentageTextInputFormatter().formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '101'),
+    );
+    expect(result.text, '10');
+  });
+
+  test('percentage_text_input_formatter_7', () {
+    // single digit
+    var result = PercentageTextInputFormatter(
+      suffix: '%',
+    ).formatEditUpdate(
+      const TextEditingValue(text: ''),
+      const TextEditingValue(text: '5'),
+    );
+    expect(result.text, '5%');
   });
 }
