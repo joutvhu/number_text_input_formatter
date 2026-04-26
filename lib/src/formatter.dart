@@ -120,6 +120,41 @@ class NumberTextInputFormatter extends TextInputFormatter {
   ) {
     if (newValue.text.isEmpty == true) return newValue;
 
+    // Detect when a group separator was deleted (backspace over auto-inserted separator).
+    // In that case, also remove the digit immediately before the deletion point
+    // so the user perceives a real deletion rather than the separator being re-inserted.
+    if (groupDigits != null &&
+        newValue.text.length == oldValue.text.length - 1) {
+      final cursorPos = newValue.selection.baseOffset;
+      // Find which character was removed by comparing old and new text.
+      int deletedIndex = -1;
+      for (int i = 0; i < newValue.text.length; i++) {
+        if (i >= oldValue.text.length || newValue.text[i] != oldValue.text[i]) {
+          deletedIndex = i;
+          break;
+        }
+      }
+      if (deletedIndex == -1) deletedIndex = oldValue.text.length - 1;
+
+      final deletedChar = oldValue.text[deletedIndex];
+      if (deletedChar == groupSeparator) {
+        // The deleted character was a group separator — also remove the digit before it.
+        final removeAt = deletedIndex - 1;
+        if (removeAt >= 0 && removeAt < newValue.text.length) {
+          final fixedText = newValue.text.substring(0, removeAt) +
+              newValue.text.substring(removeAt + 1);
+          final fixedCursor = (cursorPos - 1).clamp(0, fixedText.length);
+          return formatEditUpdate(
+            oldValue,
+            newValue.copyWith(
+              text: fixedText,
+              selection: TextSelection.collapsed(offset: fixedCursor),
+            ),
+          );
+        }
+      }
+    }
+
     TextValueEditor state = TextValueEditor(newValue);
     TextNumberFilter(this, state)
       ..prepare({'removing': oldValue.text.length - 1 == newValue.text.length})

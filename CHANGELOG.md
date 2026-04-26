@@ -1,5 +1,6 @@
 ## 1.0.0+9
 
+- Fix backspace over group separator: deleting a group separator now also removes the preceding digit, preventing the cursor from getting stuck.
 - Fix `_fixIndex` not returning clamped value in `LookupTextValueEditor`.
 - Remove unused constants (`_comma`, `_dot`, `_number_1` through `_number_8`) in filter.
 - Add return types to all methods in `TextValueEditor`, `DefaultTextValueEditor`, and `LookupTextValueEditor`.

@@ -1297,4 +1297,74 @@ void main() {
     );
     expect(result.text, '5%');
   });
+
+  // backspace over group separator
+  test('backspace_over_group_separator_1', () {
+    // "12,345" cursor after comma → backspace deletes comma → should also remove "2" → "1,345"
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 3,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '12,345',
+        selection: TextSelection.collapsed(offset: 3),
+      ),
+      const TextEditingValue(
+        text: '12345',
+        selection: TextSelection.collapsed(offset: 2),
+      ),
+    );
+    expect(result.text, '1,345');
+  });
+
+  test('backspace_over_group_separator_2', () {
+    // "1,234,567" cursor after first comma → backspace → "234,567"
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 3,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '1,234,567',
+        selection: TextSelection.collapsed(offset: 2),
+      ),
+      const TextEditingValue(
+        text: '1234,567',
+        selection: TextSelection.collapsed(offset: 1),
+      ),
+    );
+    expect(result.text, '234,567');
+  });
+
+  test('backspace_over_group_separator_3', () {
+    // Deleting a real digit (not separator) should work normally
+    var result = NumberTextInputFormatter(
+      integerDigits: 13,
+      groupDigits: 3,
+    ).formatEditUpdate(
+      const TextEditingValue(
+        text: '12,345',
+        selection: TextSelection.collapsed(offset: 6),
+      ),
+      const TextEditingValue(
+        text: '12,34',
+        selection: TextSelection.collapsed(offset: 5),
+      ),
+    );
+    expect(result.text, '1,234');
+  });
+
+  test('backspace_over_group_separator_4', () {
+    // Currency: "1,791,251.41" cursor after first comma → backspace → "179,125.14" (insertDecimalPoint)
+    var result = CurrencyTextInputFormatter().formatEditUpdate(
+      const TextEditingValue(
+        text: '1,791,251.41',
+        selection: TextSelection.collapsed(offset: 2),
+      ),
+      const TextEditingValue(
+        text: '1791,251.41',
+        selection: TextSelection.collapsed(offset: 1),
+      ),
+    );
+    expect(result.text, '791,251.41');
+  });
 }
