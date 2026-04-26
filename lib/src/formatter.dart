@@ -4,6 +4,24 @@ import 'editor.dart';
 
 part 'filter.dart';
 
+/// A [TextInputFormatter] that restricts and formats numeric input.
+///
+/// Supports integer and decimal numbers with configurable digit limits,
+/// grouping separators, decimal separators, negative values, and automatic
+/// insertion of decimal points or digits.
+///
+/// Example:
+/// ```dart
+/// TextField(
+///   inputFormatters: [
+///     NumberTextInputFormatter(
+///       integerDigits: 10,
+///       decimalDigits: 2,
+///       groupDigits: 3,
+///     ),
+///   ],
+/// )
+/// ```
 class NumberTextInputFormatter extends TextInputFormatter {
   static final numberTester = RegExp(r'^0*([1-9][0-9]*)(\.([0-9]+))?$');
 
@@ -50,6 +68,13 @@ class NumberTextInputFormatter extends TextInputFormatter {
   /// Grouping separator: default is comma.
   final String groupSeparator;
 
+  /// Creates a [NumberTextInputFormatter].
+  ///
+  /// [integerDigits] limits the number of integer digits (must be > 0 if set).
+  /// [decimalDigits] limits the number of decimal digits (must be >= 0 if set).
+  /// [maxValue] sets an upper bound; infers [integerDigits] and [decimalDigits] if not provided.
+  /// [decimalSeparator] and [groupSeparator] must be single characters and must differ.
+  /// [groupDigits] must be > 1 if set.
   NumberTextInputFormatter({
     this.prefix,
     this.suffix,
@@ -173,7 +198,19 @@ class NumberTextInputFormatter extends TextInputFormatter {
   }
 }
 
+/// A [NumberTextInputFormatter] pre-configured for currency input.
+///
+/// Defaults: 2 decimal digits, grouping every 3 digits, decimal point
+/// auto-inserted as the user types.
+///
+/// Example:
+/// ```dart
+/// TextField(
+///   inputFormatters: [CurrencyTextInputFormatter(prefix: '\$ ')],
+/// )
+/// ```
 class CurrencyTextInputFormatter extends NumberTextInputFormatter {
+  /// Creates a [CurrencyTextInputFormatter].
   CurrencyTextInputFormatter({
     String? prefix,
     String? suffix,
@@ -203,7 +240,22 @@ class CurrencyTextInputFormatter extends NumberTextInputFormatter {
         );
 }
 
+/// A [NumberTextInputFormatter] pre-configured for percentage input.
+///
+/// Defaults: max value of 100 (derived from [integerDigits]), 0 decimal
+/// digits, decimal digits always inserted. [integerDigits] must be >= 3.
+///
+/// Example:
+/// ```dart
+/// TextField(
+///   inputFormatters: [PercentageTextInputFormatter(suffix: '%')],
+/// )
+/// ```
 class PercentageTextInputFormatter extends NumberTextInputFormatter {
+  /// Creates a [PercentageTextInputFormatter].
+  ///
+  /// [integerDigits] must be >= 3. The maximum allowed value is automatically
+  /// computed as `10^(integerDigits - 1)` (e.g. `integerDigits: 3` → max `100`).
   PercentageTextInputFormatter({
     String? prefix,
     String? suffix,

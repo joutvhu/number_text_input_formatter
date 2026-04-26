@@ -1,5 +1,5 @@
 name: number_text_input_formatter
-description: Number Text Input Formatter for Flutter
+description: A Flutter TextInputFormatter for numeric fields with support for decimal, grouping, currency, and percentage formatting.
 version: 1.0.0+9
 
 homepage: https://github.com/joutvhu/number_text_input_formatter
